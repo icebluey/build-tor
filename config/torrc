@@ -1,0 +1,16 @@
+SocksPort 127.0.0.1:9050
+#Socks5Proxy 127.0.0.1:1080
+UseBridges 0
+DataDirectory /etc/tor
+GeoIPFile /usr/share/tor/geoip
+GeoIPv6File /usr/share/tor/geoip6
+Log notice syslog
+StrictNodes 1
+Sandbox 1
+AvoidDiskWrites 1
+ExcludeExitNodes {cn},{hk},{mo},{sg},{th},{pk},{by},{ru},{ir},{vn},{ph},{my},{cu}
+ExcludeNodes {cn},{hk},{mo},{sg},{th},{pk},{by},{ru},{ir},{vn},{ph},{my},{cu}
+ExitNodes {tw}
+#ExitNodes {us}
+NewCircuitPeriod 86400
+RunAsDaemon 0
