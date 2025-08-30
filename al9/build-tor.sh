@@ -313,7 +313,8 @@ _build_tor() {
     --build=x86_64-linux-gnu --host=x86_64-linux-gnu \
     --enable-gpl --enable-pic --enable-lzma --enable-zstd \
     --disable-expensive-hardening --disable-fragile-hardening --disable-libscrypt \
-    --disable-seccomp --disable-systemd --disable-html-manual --disable-asciidoc \
+    --disable-seccomp --disable-systemd --disable-html-manual \
+    --enable-asciidoc --enable-manpage \
     --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --sysconfdir=/etc
     make -j$(nproc --all) all
     rm -fr /tmp/tor
