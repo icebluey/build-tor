@@ -305,6 +305,41 @@ _build_libevent() {
     /sbin/ldconfig
 }
 
+_build_libseccomp() {
+    set -e
+    _tmp_dir="$(mktemp -d)"
+    cd "${_tmp_dir}"
+    wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz"
+    tar -xof libseccomp-*.tar*
+    sleep 1
+    rm -f libseccomp-*.tar*
+    cd libseccomp-*
+    ./configure \
+    --build=x86_64-linux-gnu \
+    --host=x86_64-linux-gnu \
+    --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin \
+    --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include \
+    --libdir=/usr/lib/x86_64-linux-gnu --libexecdir=/usr/libexec --localstatedir=/var \
+    --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info \
+    --disable-shared --enable-static
+    make -j$(nproc --all) all
+    rm -fr /tmp/libseccomp
+    make DESTDIR=/tmp/libseccomp install
+    cd /tmp/libseccomp
+    _strip_files
+    #install -m 0755 -d "${_private_dir}"
+    #cp -af usr/lib/x86_64-linux-gnu/*.so* "${_private_dir}"/
+    rm -vf /usr/lib/x86_64-linux-gnu/libseccomp.a
+    rm -vf /usr/lib/x86_64-linux-gnu/libseccomp.so*
+    sleep 2
+    /bin/cp -afr * /
+    sleep 2
+    cd /tmp
+    rm -fr "${_tmp_dir}"
+    rm -fr /tmp/libseccomp
+    /sbin/ldconfig
+}
+
 _build_tor() {
     /sbin/ldconfig
     set -e
@@ -320,9 +355,9 @@ _build_tor() {
     ./configure \
     --build=x86_64-linux-gnu --host=x86_64-linux-gnu \
     --enable-gpl --enable-pic --enable-lzma --enable-zstd \
-    --disable-expensive-hardening --disable-fragile-hardening --disable-libscrypt \
-    --disable-seccomp --disable-systemd --disable-html-manual \
-    --enable-asciidoc --enable-manpage \
+    --disable-expensive-hardening --disable-fragile-hardening \
+    --disable-libscrypt --disable-systemd --disable-html-manual \
+    --enable-seccomp --enable-asciidoc --enable-manpage \
     --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu --includedir=/usr/include --sysconfdir=/etc
     make -j$(nproc --all) all
     rm -fr /tmp/tor
@@ -357,6 +392,7 @@ _build_brotli
 _build_zstd
 _build_openssl35
 _build_libevent
+_build_libseccomp
 _build_tor
 
 rm -fr /tmp/_output
