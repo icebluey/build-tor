@@ -19,7 +19,7 @@ yum install -y openssl
 yum install -y openssl-devel
 yum install -y lksctp-tools-devel lksctp-tools
 
-yum install -y gcc cpp gcc-c++ libstdc++-devel make m4 libtool pkgconfig groff-base \
+yum install -y gcc cpp gcc-c++ libstdc++-devel make m4 gperf libtool pkgconfig groff-base \
   glibc-devel glib2-devel systemd-devel libuuid-devel ncurses-devel ncurses \
   elfutils-libelf-devel elfutils-devel elfutils kmod libselinux-devel libcom_err-devel \
   libverto-devel keyutils-libs-devel krb5-devel libkadm5 libsepol-devel \
