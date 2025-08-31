@@ -46,7 +46,7 @@ jobs:
 
       - name: Generate release tag env
         run: |
-          _release_ver="$(date -u +%Y-%m-%d-%H%M)"
+          _release_ver="$(date -u +%Y%m%dT%H%M%SZ)"
           echo "_release_ver=${_release_ver}" >> $GITHUB_ENV
 
       - name: Upload files
