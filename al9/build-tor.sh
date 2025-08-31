@@ -362,6 +362,7 @@ _build_tor() {
     rm -f usr/lib64/tor/private/libevent_extra*
     rm -f usr/lib64/tor/private/libevent_openssl*
     rm -f usr/lib64/tor/private/libevent_pthreads*
+    cd usr/share/tor/ && rm -vf geoip geoip6 geoip-plus-asn geoip6-plus-asn && wget https://github.com/icebluey/torgeoip/releases/latest/download/geoip.tar.xz && tar -xof geoip.tar.xz && sleep 1 && rm -vf geoip.tar* asn.txt version && cd /tmp/tor
     sleep 2
     tar -Jcvf /tmp/tor-"${_tor_ver}"-1_el9_amd64.tar.xz *
     echo
