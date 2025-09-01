@@ -313,14 +313,14 @@ _build_libseccomp() {
     --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include \
     --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var \
     --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info \
-    --disable-shared --enable-static
+    --enable-shared --disable-static
     make -j$(nproc --all) all
     rm -fr /tmp/libseccomp
     make DESTDIR=/tmp/libseccomp install
     cd /tmp/libseccomp
     _strip_files
-    #install -m 0755 -d "${_private_dir}"
-    #cp -af usr/lib64/*.so* "${_private_dir}"/
+    install -m 0755 -d "${_private_dir}"
+    cp -af usr/lib64/*.so* "${_private_dir}"/
     rm -vf /usr/lib64/libseccomp.a
     rm -vf /usr/lib64/libseccomp.so*
     sleep 2
