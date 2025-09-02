@@ -8,8 +8,8 @@ Log notice syslog
 StrictNodes 1
 Sandbox 1
 AvoidDiskWrites 1
-ExcludeExitNodes {cn},{hk},{mo},{sg},{th},{pk},{by},{ru},{ir},{vn},{ph},{my},{cu}
-ExcludeNodes {cn},{hk},{mo},{sg},{th},{pk},{by},{ru},{ir},{vn},{ph},{my},{cu}
+ExcludeNodes {cn},{hk},{mo},{ru},{kp},{vn},{cu},{ir},{sy},{pk},{by}
+ExcludeExitNodes {cn},{hk},{mo},{ru},{kp},{vn},{cu},{ir},{sy},{pk},{by}
 ExitNodes {tw}
 #ExitNodes {us}
 NewCircuitPeriod 86400
