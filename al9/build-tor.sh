@@ -59,11 +59,11 @@ _strip_files() {
 _build_zlib() {
     /sbin/ldconfig
     set -euo pipefail
-    _tmp_dir="$(mktemp -d)"
+    local _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    _zlib_ver="$(wget -qO- 'https://www.zlib.net/' | grep 'zlib-[1-9].*\.tar\.' | sed -e 's|"|\n|g' | grep '^zlib-[1-9]' | sed -e 's|\.tar.*||g' -e 's|zlib-||g' | sort -V | uniq | tail -n 1)"
+    _zlib_ver="$(wget -qO- 'https://www.zlib.net/' | grep -io 'href="[^"]*\.tar\.gz"' | sed 's/href="//I;s/"//' | grep -i '^zlib-[0-9]' | sed 's/zlib-\(.*\)\.tar\.gz/\1/' | sort -V | tail -n1)"
     wget -c -t 9 -T 9 "https://www.zlib.net/zlib-${_zlib_ver}.tar.gz"
-    tar -xof zlib-*.tar.*
+    tar -xof zlib-*.tar*
     rm -f zlib-*.tar*
     cd zlib-*
     ./configure --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --64
@@ -73,7 +73,7 @@ _build_zlib() {
     cd /tmp/zlib
     _strip_files
     install -m 0755 -d "${_private_dir}"
-    cp -af usr/lib64/*.so* "${_private_dir}"/
+    /bin/cp -af usr/lib64/*.so* "${_private_dir}"/
     /bin/rm -f /usr/lib64/libz.so*
     /bin/rm -f /usr/lib64/libz.a
     /bin/cp -afr * /
@@ -116,7 +116,7 @@ _build_xz() {
 _build_brotli() {
     /sbin/ldconfig
     set -euo pipefail
-    _tmp_dir="$(mktemp -d)"
+    local _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     git clone --recursive 'https://github.com/google/brotli.git' brotli
     cd brotli
@@ -154,7 +154,7 @@ _build_brotli() {
     cd /tmp/brotli
     _strip_files
     install -m 0755 -d "${_private_dir}"
-    cp -af usr/lib64/*.so* "${_private_dir}"/
+    /bin/cp -af usr/lib64/*.so* "${_private_dir}"/
     /bin/cp -afr * /
     cd /tmp
     rm -fr "${_tmp_dir}"
@@ -165,7 +165,7 @@ _build_brotli() {
 _build_zstd() {
     /sbin/ldconfig
     set -euo pipefail
-    _tmp_dir="$(mktemp -d)"
+    local _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     git clone --recursive "https://github.com/facebook/zstd.git"
     cd zstd
@@ -179,24 +179,25 @@ _build_zstd() {
     sed '/^prefix/s|= .*|= /usr|g' -i lib/Makefile
     sed '/^libdir/s|= .*|= /usr/lib64|g' -i lib/Makefile
     sed '/^PREFIX/s|= .*|= /usr|g' -i programs/Makefile
-    #sed '/^LIBDIR/s|= .*|= /usr/lib64|g' -i programs/Makefile
     sed '/^prefix/s|= .*|= /usr|g' -i programs/Makefile
-    #sed '/^libdir/s|= .*|= /usr/lib64|g' -i programs/Makefile
-    LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$OOORIGIN'; export LDFLAGS
-    #make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64
-    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C lib lib-mt
+    #LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$OOORIGIN'; export LDFLAGS
     LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
-    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C programs
-    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C contrib/pzstd
+    make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C lib lib-mt
+    # build bin
+    #LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"; export LDFLAGS
+    #make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C programs
+    #make -j$(nproc --all) V=1 prefix=/usr libdir=/usr/lib64 -C contrib/pzstd
     rm -fr /tmp/zstd
-    make install DESTDIR=/tmp/zstd
-    install -v -c -m 0755 contrib/pzstd/pzstd /tmp/zstd/usr/bin/
+    make install DESTDIR=/tmp/zstd -C lib
+    #make install DESTDIR=/tmp/zstd
+    #install -v -c -m 0755 contrib/pzstd/pzstd /tmp/zstd/usr/bin/
     cd /tmp/zstd
-    ln -svf zstd.1 usr/share/man/man1/pzstd.1
+    #ln -svf zstd.1 usr/share/man/man1/pzstd.1
     _strip_files
-    find usr/lib64/ -type f -iname '*.so*' | xargs -I '{}' chrpath -r '$ORIGIN' '{}'
+    #find usr/lib64/ -type f -iname '*.so*' | xargs -I '{}' patchelf --force-rpath --set-rpath '$ORIGIN' '{}'
     install -m 0755 -d "${_private_dir}"
-    cp -af usr/lib64/*.so* "${_private_dir}"/
+    /bin/cp -af usr/lib64/*.so* "${_private_dir}"/
+    rm -f /usr/lib64/libzstd.*
     /bin/cp -afr * /
     cd /tmp
     rm -fr "${_tmp_dir}"
@@ -205,8 +206,9 @@ _build_zstd() {
 }
 
 _build_openssl35() {
+    /sbin/ldconfig
     set -euo pipefail
-    _tmp_dir="$(mktemp -d)"
+    local _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _openssl35_ver="$(wget -qO- 'https://openssl-library.org/source/index.html' | grep 'openssl-3\.5\.' | sed 's|"|\n|g' | sed 's|/|\n|g' | grep -i '^openssl-3\.5\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 https://github.com/openssl/openssl/releases/download/openssl-${_openssl35_ver}/openssl-${_openssl35_ver}.tar.gz
@@ -214,7 +216,7 @@ _build_openssl35() {
     rm -f openssl-*.tar*
     cd openssl-*
     sed '/install_docs:/s| install_html_docs||g' -i Configurations/unix-Makefile.tmpl
-    LDFLAGS=''; LDFLAGS='-Wl,-z,relro -Wl,--as-needed -Wl,-z,now -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
+    LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
     HASHBANGPERL=/usr/bin/perl
     ./Configure \
     --prefix=/usr \
@@ -240,7 +242,7 @@ _build_openssl35() {
     sed 's|http://|https://|g' -i usr/lib64/pkgconfig/*.pc
     _strip_files
     install -m 0755 -d "${_private_dir}"
-    cp -af usr/lib64/*.so* "${_private_dir}"/
+    /bin/cp -af usr/lib64/*.so* "${_private_dir}"/
     rm -fr /usr/include/openssl
     rm -fr /usr/include/x86_64-linux-gnu/openssl
     /bin/cp -afr * /
