@@ -16,7 +16,7 @@ export CXX
 
 _private_dir='usr/lib64/tor/private'
 
-set -e
+set -euo pipefail
 
 _strip_files() {
     if [[ "$(pwd)" = '/' ]]; then
@@ -61,7 +61,7 @@ _strip_files() {
 
 _build_zlib() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _zlib_ver="$(wget -qO- 'https://www.zlib.net/' | grep 'zlib-[1-9].*\.tar\.' | sed -e 's|"|\n|g' | grep '^zlib-[1-9]' | sed -e 's|\.tar.*||g' -e 's|zlib-||g' | sort -V | uniq | tail -n 1)"
@@ -91,7 +91,7 @@ _build_zlib() {
 
 _build_xz() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _xz_ver="$(wget -qO- 'https://github.com/tukaani-project/xz/releases' | grep -i '/tukaani-project/xz/releases/download/v[1-9]' | sed 's| |\n|g' | grep -i '/tukaani-project/xz/releases/download/v' | sed -e 's|.*/xz-||g' -e 's|"||g' | grep -ivE 'alpha|beta|rc|win' | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
@@ -124,7 +124,7 @@ _build_xz() {
 
 _build_brotli() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     git clone --recursive 'https://github.com/google/brotli.git' brotli
@@ -175,7 +175,7 @@ _build_brotli() {
 
 _build_zstd() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     git clone --recursive "https://github.com/facebook/zstd.git"
@@ -218,7 +218,7 @@ _build_zstd() {
 }
 
 _build_openssl35() {
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _openssl35_ver="$(wget -qO- 'https://openssl-library.org/source/index.html' | grep 'openssl-3\.5\.' | sed 's|"|\n|g' | sed 's|/|\n|g' | grep -i '^openssl-3\.5\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
@@ -268,7 +268,7 @@ _build_openssl35() {
 
 _build_libevent() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _libevent_ver="$(wget -qO- 'https://github.com/libevent/libevent/releases' | grep -i 'libevent/releases/tag/release-[1-9]' | sed 's| |\n|g' | grep -i 'libevent/releases/tag/release-[1-9]' | sed -e 's|.*/release-||g' -e 's|"||g' | grep -ivE 'alpha|beta|rc' | sort -V | uniq | tail -n 1)"
@@ -299,7 +299,7 @@ _build_libevent() {
 }
 
 _build_libseccomp() {
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz"
@@ -335,7 +335,7 @@ _build_libseccomp() {
 
 _build_tor() {
     /sbin/ldconfig
-    set -e
+    set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
     _tor_ver="$(wget -qO- 'https://www.torproject.org/download/tor/' | grep -i 'https://dist.torproject.org/tor-[0-9]' | sed 's| |\n|g' | grep -i 'https://dist.torproject.org/tor-[0-9]' | grep -ivE 'alpha|beta|rc|win' | sed -e 's|.*/tor-||g' -e 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
