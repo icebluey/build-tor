@@ -3,7 +3,7 @@
 ```
 apt install -y libc6 libcap2
 
-yum install -y glibc libcap libcap-devel
+yum install -y glibc libcap
 ```
 
 Fresh [geoip](https://github.com/icebluey/torgeoip) files.
