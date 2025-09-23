@@ -19,7 +19,7 @@ fi
 sleep 2
 docker exec al9 yum clean all
 docker exec al9 yum makecache
-docker exec al9 yum install -y wget bash
+docker exec al9 yum install -y wget bash glibc libcap libcap-devel
 docker exec al9 /bin/bash -c 'ln -svf bash /bin/sh'
 docker exec al9 /bin/bash -c 'rm -fr /tmp/*'
 docker cp al9 al9:/home/
