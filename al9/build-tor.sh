@@ -33,11 +33,8 @@ _strip_files() {
     find usr/ -type f -iname '*.la' -delete
     if [[ -d usr/share/man ]]; then
         find -L usr/share/man/ -type l -exec rm -f '{}' \;
-        sleep 2
         find usr/share/man/ -type f -iname '*.[1-9]' -exec gzip -f -9 '{}' \;
-        sleep 2
         find -L usr/share/man/ -type l | while read file; do ln -svf "$(readlink -s "${file}").gz" "${file}.gz" ; done
-        sleep 2
         find -L usr/share/man/ -type l -exec rm -f '{}' \;
     fi
     if [[ -d usr/lib/x86_64-linux-gnu ]]; then
@@ -67,7 +64,6 @@ _build_zlib() {
     _zlib_ver="$(wget -qO- 'https://www.zlib.net/' | grep 'zlib-[1-9].*\.tar\.' | sed -e 's|"|\n|g' | grep '^zlib-[1-9]' | sed -e 's|\.tar.*||g' -e 's|zlib-||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 "https://www.zlib.net/zlib-${_zlib_ver}.tar.gz"
     tar -xof zlib-*.tar.*
-    sleep 1
     rm -f zlib-*.tar*
     cd zlib-*
     ./configure --prefix=/usr --libdir=/usr/lib64 --includedir=/usr/include --64
@@ -80,9 +76,7 @@ _build_zlib() {
     cp -af usr/lib64/*.so* "${_private_dir}"/
     /bin/rm -f /usr/lib64/libz.so*
     /bin/rm -f /usr/lib64/libz.a
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/zlib
@@ -97,7 +91,6 @@ _build_xz() {
     _xz_ver="$(wget -qO- 'https://github.com/tukaani-project/xz/releases' | grep -i '/tukaani-project/xz/releases/download/v[1-9]' | sed 's| |\n|g' | grep -i '/tukaani-project/xz/releases/download/v' | sed -e 's|.*/xz-||g' -e 's|"||g' | grep -ivE 'alpha|beta|rc|win' | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 "https://github.com/tukaani-project/xz/releases/download/v${_xz_ver}/xz-${_xz_ver}.tar.gz"
     tar -xof xz-*.tar.*
-    sleep 1
     rm -f xz-*.tar*
     cd xz-*
     LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
@@ -113,9 +106,7 @@ _build_xz() {
     _strip_files
     install -m 0755 -d "${_private_dir}"
     cp -af usr/lib64/*.so* "${_private_dir}"/
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/xz
@@ -164,9 +155,7 @@ _build_brotli() {
     _strip_files
     install -m 0755 -d "${_private_dir}"
     cp -af usr/lib64/*.so* "${_private_dir}"/
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/brotli
@@ -208,9 +197,7 @@ _build_zstd() {
     find usr/lib64/ -type f -iname '*.so*' | xargs -I '{}' chrpath -r '$ORIGIN' '{}'
     install -m 0755 -d "${_private_dir}"
     cp -af usr/lib64/*.so* "${_private_dir}"/
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/zstd
@@ -224,7 +211,6 @@ _build_openssl35() {
     _openssl35_ver="$(wget -qO- 'https://openssl-library.org/source/index.html' | grep 'openssl-3\.5\.' | sed 's|"|\n|g' | sed 's|/|\n|g' | grep -i '^openssl-3\.5\..*\.tar\.gz$' | cut -d- -f2 | sed 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 https://github.com/openssl/openssl/releases/download/openssl-${_openssl35_ver}/openssl-${_openssl35_ver}.tar.gz
     tar -xof openssl-*.tar*
-    sleep 1
     rm -f openssl-*.tar*
     cd openssl-*
     sed '/install_docs:/s| install_html_docs||g' -i Configurations/unix-Makefile.tmpl
@@ -257,9 +243,7 @@ _build_openssl35() {
     cp -af usr/lib64/*.so* "${_private_dir}"/
     rm -fr /usr/include/openssl
     rm -fr /usr/include/x86_64-linux-gnu/openssl
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/openssl35
@@ -274,7 +258,6 @@ _build_libevent() {
     _libevent_ver="$(wget -qO- 'https://github.com/libevent/libevent/releases' | grep -i 'libevent/releases/tag/release-[1-9]' | sed 's| |\n|g' | grep -i 'libevent/releases/tag/release-[1-9]' | sed -e 's|.*/release-||g' -e 's|"||g' | grep -ivE 'alpha|beta|rc' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 "https://github.com/libevent/libevent/releases/download/release-${_libevent_ver}/libevent-${_libevent_ver}.tar.gz"
     tar -xof libevent-*.tar*
-    sleep 1
     rm -f libevent-*.tar*
     cd libevent-*
     LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$ORIGIN'; export LDFLAGS
@@ -289,9 +272,7 @@ _build_libevent() {
     _strip_files
     install -m 0755 -d "${_private_dir}"
     cp -af usr/lib64/*.so* "${_private_dir}"/
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/libevent
@@ -304,7 +285,6 @@ _build_libseccomp() {
     cd "${_tmp_dir}"
     wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz"
     tar -xof libseccomp-*.tar*
-    sleep 1
     rm -f libseccomp-*.tar*
     cd libseccomp-*
     ./configure \
@@ -324,9 +304,7 @@ _build_libseccomp() {
     cp -af usr/lib64/*.so* "${_private_dir}"/
     rm -vf /usr/lib64/libseccomp.a
     rm -vf /usr/lib64/libseccomp.so*
-    sleep 2
     /bin/cp -afr * /
-    sleep 2
     cd /tmp
     rm -fr "${_tmp_dir}"
     rm -fr /tmp/libseccomp
@@ -341,7 +319,6 @@ _build_tor() {
     _tor_ver="$(wget -qO- 'https://www.torproject.org/download/tor/' | grep -i 'https://dist.torproject.org/tor-[0-9]' | sed 's| |\n|g' | grep -i 'https://dist.torproject.org/tor-[0-9]' | grep -ivE 'alpha|beta|rc|win' | sed -e 's|.*/tor-||g' -e 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 "https://dist.torproject.org/tor-${_tor_ver}.tar.gz"
     tar -xof tor-*.tar*
-    sleep 1
     rm -f tor-*.tar*
     cd tor-*
     LDFLAGS=''; LDFLAGS="${_ORIG_LDFLAGS}"' -Wl,--disable-new-dtags -Wl,-rpath,\$$ORIGIN/../lib64/tor/private'; export LDFLAGS
@@ -364,10 +341,8 @@ _build_tor() {
     rm -f usr/lib64/tor/private/libevent_openssl*
     rm -f usr/lib64/tor/private/libevent_pthreads*
     cd usr/share/tor/ && rm -vf geoip geoip6 geoip-plus-asn geoip6-plus-asn && wget https://github.com/icebluey/torgeoip/releases/latest/download/geoip.tar.xz && tar -xof geoip.tar.xz && sleep 1 && rm -vf geoip.tar* asn.txt version && cd /tmp/tor
-    sleep 2
     tar -Jcvf /tmp/tor-"${_tor_ver}"-1_el9_amd64.tar.xz *
     echo
-    sleep 2
     cd /tmp
     openssl dgst -r -sha256 tor-"${_tor_ver}"-1_el9_amd64.tar.xz | sed 's|\*| |g' > tor-"${_tor_ver}"-1_el9_amd64.tar.xz.sha256
     cd /tmp
