@@ -322,7 +322,7 @@ _build_tor() {
     set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    _tor_ver="$(wget -qO- 'https://dist.torproject.org/' | grep -i 'tor-[0-9]' | sed 's|"|\n|g' | grep -i '^tor-[0-9]' | grep -ivE 'alpha|beta|rc|win' | sed -e 's|.*/tor-||g' -e 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
+    _tor_ver="$(wget -qO- 'https://dist.torproject.org/' | grep -i 'tor-[0-9]' | sed 's|"|\n|g' | grep -i '^tor-[0-9]' | grep -ivE 'alpha|beta|rc|win' | sed -e 's|.*tor-||g' -e 's|\.tar.*||g' | sort -V | uniq | tail -n 1)"
     wget -c -t 9 -T 9 "https://dist.torproject.org/tor-${_tor_ver}.tar.gz"
     tar -xof tor-*.tar*
     rm -f tor-*.tar*
