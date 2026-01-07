@@ -46,13 +46,13 @@ jobs:
 
       - name: Generate release tag env
         run: |
-          _release_ver="$(date -u +%Y%m%dT%H%M%SZ)"
+          _release_ver="$(/bin/ls -1 /tmp/_output_assets/_output/tor-*_amd64.tar.xz | grep -i 'el9_amd64.tar.xz$' | sed -e 's|.*tor-||g' -e 's|-[1-9].*||g' | head -1)"
           echo "_release_ver=${_release_ver}" >> $GITHUB_ENV
 
       - name: Upload files
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env._release_ver }}
+          tag_name: v${{ env._release_ver }}
           files: /tmp/_output_assets/_output/*
 
       - name: Delete old release tag env
