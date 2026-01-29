@@ -26,25 +26,25 @@ jobs:
         run: |
           sudo /bin/bash run-build-al9.sh
           sudo /bin/systemctl stop docker.socket docker.service containerd.service
-          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/* /mnt/containerd-data/*
 
       - name: Build tor al8
         run: |
           sudo /bin/bash run-build-al8.sh
           sudo /bin/systemctl stop docker.socket docker.service containerd.service
-          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/* /mnt/containerd-data/*
 
       - name: Build tor ub2204
         run: |
           sudo /bin/bash run-build-ub2204.sh
           sudo /bin/systemctl stop docker.socket docker.service containerd.service
-          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/* /mnt/containerd-data/*
 
       - name: Build tor ub2004
         run: |
           sudo /bin/bash run-build-ub2004.sh
           sudo /bin/systemctl stop docker.socket docker.service containerd.service
-          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/*
+          sudo /bin/rm -fr /var/lib/docker/* /var/lib/containerd/* /mnt/docker-data/* /mnt/containerd-data/*
 
       - name: Generate release tag env
         run: |
@@ -55,8 +55,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env._release_ver }}
-          files: /tmp/_output_assets/_output/*
+          files: /tmp/_output_assets/_output/tor*.tar*
 
       - name: Delete old release tag env
         run: |
           sed -e "/^_release_ver=/d" -i $GITHUB_ENV
+          sudo rm -fr /tmp/_output_assets
