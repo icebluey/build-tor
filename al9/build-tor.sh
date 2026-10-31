@@ -121,6 +121,7 @@ _build_brotli() {
     cd "${_tmp_dir}"
     git clone --recursive 'https://github.com/google/brotli.git' brotli
     cd brotli
+    git checkout v1.2
     rm -fr .git
     if [[ -f bootstrap ]]; then
         ./bootstrap
@@ -286,7 +287,9 @@ _build_libseccomp() {
     set -euo pipefail
     _tmp_dir="$(mktemp -d)"
     cd "${_tmp_dir}"
-    wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v2.6.0/libseccomp-2.6.0.tar.gz"
+    libseccomp_ver="$(wget -qO- 'https://github.com/seccomp/libseccomp/releases/' | grep -i '/seccomp/libseccomp/releases/tag/' | sed 's|"|\n|g' | grep -i '^/seccomp/libseccomp/releases/tag/' | sed 's|.*[Vv]||g' | sort -V | tail -n 1)"
+    #wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v2.6.1/libseccomp-2.6.1.tar.gz"
+    wget -c -t 9 -T 9 "https://github.com/seccomp/libseccomp/releases/download/v${libseccomp_ver}/libseccomp-${libseccomp_ver}.tar.gz"
     tar -xof libseccomp-*.tar*
     rm -f libseccomp-*.tar*
     cd libseccomp-*
